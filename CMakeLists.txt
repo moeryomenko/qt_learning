@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 project(application LANGUAGES CXX)
 
+set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -35,7 +36,7 @@ if(USE_CONAN)
   conan_basic_setup()
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Gui Quick)
 qt_standard_project_setup()
 
 add_subdirectory(src)

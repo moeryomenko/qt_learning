@@ -1,6 +1,6 @@
 /* The GPLv3 License (GPLv3)
 
-Copyright (c) 2022 Maxim Eryomenko
+Copyright (c) 2022 Maxim Eryomenko <maxim_eryomenko@rambler.ru>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,6 +16,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QtQml>
 
-int main() { return EXIT_SUCCESS; }
+int main(int argc, char **argv) {
+  QGuiApplication app(argc, argv);
+
+  QQmlApplicationEngine engine;
+  engine.load(QUrl(u"qrc:/main/main.qml"_qs));
+
+  return app.exec();
+}
