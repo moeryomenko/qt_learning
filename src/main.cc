@@ -18,13 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <QtQml>
+#include <QQmlContext>
 
 int main(int argc, char **argv) {
   QGuiApplication app(argc, argv);
 
   QQmlApplicationEngine engine;
-  engine.load(QUrl(u"qrc:/main/main.qml"_qs));
+
+  const QUrl url(u"qrc:/pages/main.qml"_qs);
+  QObject::connect(
+      &engine, &QQmlApplicationEngine::objectCreated, &app,
+      [&url](QObject *obj, const QUrl &objUrl) {
+        if (!obj && url == objUrl) {
+          QCoreApplication::exit(-1);
+        }
+      },
+      Qt::QueuedConnection);
+  engine.load(url);
 
   return app.exec();
 }
