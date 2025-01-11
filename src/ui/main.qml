@@ -18,7 +18,7 @@ Window {
         anchors.fill: parent
         states: [
             State {
-                when: window.width >= responsiveWidth
+                when: window.width >= window.responsiveWidth
 
                 ParentChange {
                     target: contacts
@@ -31,10 +31,10 @@ Window {
                 }
 
                 PropertyChanges {
-                    target: indicator
-                    visible: hide
+                    indicator: {
+                        visible: hide;
+                    }
                 }
-
             }
         ]
 
@@ -49,9 +49,7 @@ Window {
                     width: 5
                     color: "white"
                 }
-
             }
-
         }
 
         Item {
@@ -65,11 +63,8 @@ Window {
                     width: 5
                     color: "white"
                 }
-
             }
-
         }
-
     }
 
     PageIndicator {
@@ -83,7 +78,6 @@ Window {
             bottomMargin: 10
             horizontalCenter: swipeView.horizontalCenter
         }
-
     }
 
     Row {
@@ -104,7 +98,5 @@ Window {
             width: parent.width / 2
             height: parent.height
         }
-
     }
-
 }
