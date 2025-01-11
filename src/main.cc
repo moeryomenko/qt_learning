@@ -21,11 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QQmlContext>
 
 int main(int argc, char **argv) {
+  using namespace Qt::StringLiterals;
+
   QGuiApplication app(argc, argv);
 
   QQmlApplicationEngine engine;
 
-  const QUrl url(u"qrc:/pages/main.qml"_qs);
+  const QUrl url(u"qrc:/pages/main.qml"_s);
   QObject::connect(
       &engine, &QQmlApplicationEngine::objectCreated, &app,
       [&url](QObject *obj, const QUrl &objUrl) {
