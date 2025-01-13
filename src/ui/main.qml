@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
+import QtQuick.Layouts
 
 Window {
     id: window
@@ -75,7 +76,7 @@ Window {
 
         anchors {
             bottom: swipeView.bottom
-            bottomMargin: 10
+            bottomMargin: 60
             horizontalCenter: swipeView.horizontalCenter
         }
     }
@@ -97,6 +98,35 @@ Window {
 
             width: parent.width / 2
             height: parent.height
+        }
+    }
+
+    Rectangle {
+        id: bottomPanel
+
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: 50
+        color: "darkgray"
+
+        RowLayout {
+            anchors.fill: parent
+            spacing: 10
+
+            Button {
+                text: "Button 1"
+                Layout.fillWidth: true
+            }
+
+            Button {
+                text: "Button 2"
+                Layout.fillWidth: true
+            }
+
+            Button {
+                text: "Button 3"
+                Layout.fillWidth: true
+            }
         }
     }
 }
