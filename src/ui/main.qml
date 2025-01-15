@@ -12,92 +12,88 @@ Window {
     width: 300
     height: 500
 
-    SwipeView {
-        id: swipeView
-
-        currentIndex: 1
-        anchors.fill: parent
-        states: [
-            State {
-                when: window.width >= window.responsiveWidth
-
-                ParentChange {
-                    target: contacts
-                    parent: contactsContainer
-                }
-
-                ParentChange {
-                    target: chat
-                    parent: chatContainer
-                }
-
-                PropertyChanges {
-                    indicator: {
-                        visible: hide;
-                    }
-                }
-            }
-        ]
-
-        Item {
-            Rectangle {
-                id: contacts
-
-                anchors.fill: parent
-                color: "lightblue"
-
-                border {
-                    width: 5
-                    color: "white"
-                }
-            }
-        }
-
-        Item {
-            Rectangle {
-                id: chat
-
-                anchors.fill: parent
-                color: "lightgray"
-
-                border {
-                    width: 5
-                    color: "white"
-                }
-            }
-        }
-    }
-
-    PageIndicator {
-        id: indicator
-
-        count: swipeView.count
-        currentIndex: swipeView.currentIndex
+    Item {
+        id: mainViewContainer
 
         anchors {
-            bottom: swipeView.bottom
-            bottomMargin: 60
-            horizontalCenter: swipeView.horizontalCenter
-        }
-    }
-
-    Row {
-        id: splitView
-
-        anchors.fill: parent
-
-        Item {
-            id: contactsContainer
-
-            width: parent.width / 2
-            height: parent.height
+            fill: parent
+            bottomMargin: bottomPanel.height
         }
 
-        Item {
-            id: chatContainer
+        SwipeView {
+            id: swipeView
 
-            width: parent.width / 2
-            height: parent.height
+            currentIndex: 1
+            anchors.fill: parent
+
+            states: [
+                State {
+                    when: window.width >= window.responsiveWidth
+
+                    ParentChange {
+                        target: contacts
+                        parent: contactsContainer
+                    }
+                    ParentChange {
+                        target: chat
+                        parent: chatContainer
+                    }
+
+                    PropertyChanges {
+                        indicator.visible: hide
+                    }
+                }
+            ]
+
+            Item {
+                Rectangle {
+                    id: contacts
+                    anchors.fill: parent
+                    color: "lightblue"
+                    border.width: 5
+                    border.color: "white"
+                }
+            }
+
+            Item {
+                Rectangle {
+                    id: chat
+                    anchors.fill: parent
+                    color: "lightgray"
+                    border.width: 5
+                    border.color: "white"
+                }
+            }
+        }
+
+        PageIndicator {
+            id: indicator
+
+            count: swipeView.count
+            currentIndex: swipeView.currentIndex
+
+            anchors {
+                bottom: swipeView.bottom
+                bottomMargin: 10
+                horizontalCenter: swipeView.horizontalCenter
+            }
+        }
+
+        Row {
+            id: splitView
+            anchors.fill: parent
+
+            Item {
+                id: contactsContainer
+                width: parent.width / 3
+                height: parent.height
+            }
+
+            Item {
+                id: chatContainer
+                width: 2 * parent.width / 3
+                height: parent.height
+            }
         }
     }
 
