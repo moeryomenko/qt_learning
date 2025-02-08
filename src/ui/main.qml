@@ -1,128 +1,49 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Window
+import QtQuick.Controls.Material
 import QtQuick.Layouts
 
-Window {
+ApplicationWindow {
     id: window
-
-    readonly property int responsiveWidth: 500
-
     visible: true
-    width: 300
-    height: 500
 
-    Item {
-        id: mainViewContainer
+    Material.background: "#292e42"
 
-        anchors {
-            fill: parent
-            bottomMargin: bottomPanel.height
-        }
+    header: ToolBar {
+        Material.background: "#1f2335"
 
-        SwipeView {
-            id: swipeView
-
-            currentIndex: 1
-            anchors.fill: parent
-
-            states: [
-                State {
-                    when: window.width >= window.responsiveWidth
-
-                    ParentChange {
-                        target: contacts
-                        parent: contactsContainer
-                    }
-                    ParentChange {
-                        target: chat
-                        parent: chatContainer
-                    }
-
-                    PropertyChanges {
-                        indicator.visible: hide
-                    }
-                }
-            ]
-
-            Item {
-                Rectangle {
-                    id: contacts
-                    anchors.fill: parent
-                    color: "lightblue"
-                    border.width: 5
-                    border.color: "white"
-                }
-            }
-
-            Item {
-                Rectangle {
-                    id: chat
-                    anchors.fill: parent
-                    color: "lightgray"
-                    border.width: 5
-                    border.color: "white"
-                }
-            }
-        }
-
-        PageIndicator {
-            id: indicator
-
-            count: swipeView.count
-            currentIndex: swipeView.currentIndex
-
-            anchors {
-                bottom: swipeView.bottom
-                bottomMargin: 10
-                horizontalCenter: swipeView.horizontalCenter
-            }
-        }
-
-        Row {
-            id: splitView
-            anchors.fill: parent
-
-            Item {
-                id: contactsContainer
-                width: parent.width / 3
-                height: parent.height
-            }
-
-            Item {
-                id: chatContainer
-                width: 2 * parent.width / 3
-                height: parent.height
-            }
+        Label {
+            anchors.centerIn: parent
+            text: "󰠮 Notes book"
+            color: "#a9b1d6"
+            font.pixelSize: 20
+            elide: Label.ElideRight
         }
     }
 
-    Rectangle {
-        id: bottomPanel
+    StackLayout {
+        id: mainView
 
-        anchors.bottom: parent.bottom
-        width: parent.width
-        height: 50
-        color: "darkgray"
-
-        RowLayout {
-            anchors.fill: parent
-            spacing: 10
-
-            Button {
-                text: "Button 1"
-                Layout.fillWidth: true
-            }
-
-            Button {
-                text: "Button 2"
-                Layout.fillWidth: true
-            }
-
-            Button {
-                text: "Button 3"
-                Layout.fillWidth: true
-            }
+        StackLayout {
+            id: notesList
         }
+    }
+
+    RoundButton {
+        id: fab
+        implicitHeight: fab.size
+        implicitWidth: fab.size
+        highlighted: true
+
+        text: ""
+        font.pixelSize: 32
+
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 20
+
+        Material.foreground: "#ff007c"
+
+        property double size: 64.0
     }
 }

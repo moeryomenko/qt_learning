@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickStyle>
 
 int main(int argc, char **argv) {
   using namespace Qt::StringLiterals;
@@ -26,6 +27,8 @@ int main(int argc, char **argv) {
   QGuiApplication app(argc, argv);
 
   QQmlApplicationEngine engine;
+
+  QQuickStyle::setStyle("Material");
 
   const QUrl url(u"qrc:/pages/main.qml"_s);
   QObject::connect(
