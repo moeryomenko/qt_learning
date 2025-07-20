@@ -25,14 +25,14 @@ Column {
             spacing: 4
 
             SvgIcon {
-                iconName: expanded ? "chevron-down" : "chevron-right"
+                iconName: root.expanded ? "chevron-down" : "chevron-right"
                 iconColor: "#72767d"
                 size: 10
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Text {
-                text: categoryName
+                text: root.categoryName
                 color: "#72767d"
                 font.pixelSize: 12
                 font.weight: Font.Bold
@@ -42,17 +42,17 @@ Column {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: expanded = !expanded
+            onClicked: expanded = !root.expanded
         }
     }
 
     Column {
         width: parent.width
-        visible: expanded
+        visible: root.expanded
         spacing: 1
 
         Repeater {
-            model: channels
+            model: root.channels
 
             ChannelItem {
                 width: parent.width

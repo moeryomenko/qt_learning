@@ -12,6 +12,9 @@ Window {
     readonly property bool isDesktop: width >= desktopBreakpoint
 
     property bool memberSidebarVisible: isDesktop
+    property bool voiceChannelViewVisible: false
+    property string currentVoiceChannel: ""
+    property string currentVoiceServer: ""
 
     visible: true
     width: 1200
@@ -34,14 +37,63 @@ Window {
             id: channelSidebar
             Layout.preferredWidth: isMobile ? 0 : 240
             Layout.fillHeight: true
-            visible: !isMobile
+            visible: !isMobile && !voiceChannelViewVisible
+
+            onVoiceChannelClicked: function (channelName, serverName) {
+                currentVoiceChannel = channelName;
+                currentVoiceServer = serverName;
+                voiceChannelViewVisible = true;
+            }
         }
 
         ChatArea {
             id: chatArea
             Layout.fillWidth: true
             Layout.fillHeight: true
+            visible: !voiceChannelViewVisible
             onMemberListToggled: memberSidebarVisible = !memberSidebarVisible
+        }
+
+        VoiceChannelView {
+            id: voiceChannelView
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            visible: voiceChannelViewVisible
+            channelName: currentVoiceChannel
+            serverName: currentVoiceServer
+
+            onCloseView: {
+                voiceChannelViewVisible = false;
+            }
+
+            onToggleMute: {
+                console.log("Toggle mute");
+            }
+
+            onToggleDeafen: {
+                console.log("Toggle deafen");
+            }
+
+            onToggleCamera: {
+                console.log("Toggle camera");
+            }
+
+            onToggleScreenShare: {
+                console.log("Toggle screen share");
+            }
+
+            onLeaveChannel: {
+                voiceChannelViewVisible = false;
+                console.log("Left voice channel");
+            }
+
+            onInviteUsers: {
+                console.log("Invite users");
+            }
+
+            onOpenSettings: {
+                console.log("Open settings");
+            }
         }
 
         MemberSidebar {

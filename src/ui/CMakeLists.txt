@@ -18,6 +18,8 @@ qt_add_qml_module(ui
     IconButton.qml
     MobileNavigation.qml
     MobileNavButton.qml
-    SvgIcon.qml)
+    SvgIcon.qml
+    VoiceChannelView.qml
+    VoiceParticipant.qml)
 
 target_sources(ui PRIVATE ${ui_icons})

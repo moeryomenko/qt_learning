@@ -8,6 +8,8 @@ Rectangle {
     property string serverName: "General Server"
     property int selectedChannel: 0
 
+    signal voiceChannelClicked(string channelName, string serverName)
+
     Column {
         anchors.fill: parent
         spacing: 0
@@ -107,7 +109,10 @@ Rectangle {
                         }
                     ]
                     onChannelClicked: function (index) {
-                        console.log("Voice channel clicked:", index);
+                        var channel = channels[index];
+                        if (channel && channel.type === "voice") {
+                            root.voiceChannelClicked(channel.name, root.serverName);
+                        }
                     }
                 }
 
