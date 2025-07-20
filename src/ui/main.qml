@@ -1,128 +1,62 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
 
 Window {
     id: window
 
-    readonly property int responsiveWidth: 500
+    readonly property int tabletBreakpoint: 768
+    readonly property int desktopBreakpoint: 1024
+    readonly property bool isMobile: width < tabletBreakpoint
+    readonly property bool isTablet: width >= tabletBreakpoint && width < desktopBreakpoint
+    readonly property bool isDesktop: width >= desktopBreakpoint
+
+    property bool memberSidebarVisible: isDesktop
 
     visible: true
-    width: 300
-    height: 500
+    width: 1200
+    height: 800
+    color: "#36393f"
 
-    Item {
-        id: mainViewContainer
+    RowLayout {
+        id: mainLayout
+        anchors.fill: parent
+        spacing: 0
 
-        anchors {
-            fill: parent
-            bottomMargin: bottomPanel.height
+        ServerSidebar {
+            id: serverSidebar
+            Layout.preferredWidth: isMobile ? 0 : 72
+            Layout.fillHeight: true
+            visible: !isMobile
         }
 
-        SwipeView {
-            id: swipeView
-
-            currentIndex: 1
-            anchors.fill: parent
-
-            states: [
-                State {
-                    when: window.width >= window.responsiveWidth
-
-                    ParentChange {
-                        target: contacts
-                        parent: contactsContainer
-                    }
-                    ParentChange {
-                        target: chat
-                        parent: chatContainer
-                    }
-
-                    PropertyChanges {
-                        indicator.visible: hide
-                    }
-                }
-            ]
-
-            Item {
-                Rectangle {
-                    id: contacts
-                    anchors.fill: parent
-                    color: "lightblue"
-                    border.width: 5
-                    border.color: "white"
-                }
-            }
-
-            Item {
-                Rectangle {
-                    id: chat
-                    anchors.fill: parent
-                    color: "lightgray"
-                    border.width: 5
-                    border.color: "white"
-                }
-            }
+        ChannelSidebar {
+            id: channelSidebar
+            Layout.preferredWidth: isMobile ? 0 : 240
+            Layout.fillHeight: true
+            visible: !isMobile
         }
 
-        PageIndicator {
-            id: indicator
-
-            count: swipeView.count
-            currentIndex: swipeView.currentIndex
-
-            anchors {
-                bottom: swipeView.bottom
-                bottomMargin: 10
-                horizontalCenter: swipeView.horizontalCenter
-            }
+        ChatArea {
+            id: chatArea
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            onMemberListToggled: memberSidebarVisible = !memberSidebarVisible
         }
 
-        Row {
-            id: splitView
-            anchors.fill: parent
-
-            Item {
-                id: contactsContainer
-                width: parent.width / 3
-                height: parent.height
-            }
-
-            Item {
-                id: chatContainer
-                width: 2 * parent.width / 3
-                height: parent.height
-            }
+        MemberSidebar {
+            id: memberSidebar
+            Layout.preferredWidth: memberSidebarVisible ? 240 : 0
+            Layout.fillHeight: true
+            visible: memberSidebarVisible && !isMobile
         }
     }
 
-    Rectangle {
-        id: bottomPanel
-
+    MobileNavigation {
+        id: mobileNav
         anchors.bottom: parent.bottom
         width: parent.width
-        height: 50
-        color: "darkgray"
-
-        RowLayout {
-            anchors.fill: parent
-            spacing: 10
-
-            Button {
-                text: "Button 1"
-                Layout.fillWidth: true
-            }
-
-            Button {
-                text: "Button 2"
-                Layout.fillWidth: true
-            }
-
-            Button {
-                text: "Button 3"
-                Layout.fillWidth: true
-            }
-        }
+        height: 60
+        visible: isMobile
     }
 }
