@@ -35,7 +35,7 @@ if(USE_CONAN)
   conan_basic_setup()
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Gui Quick)
+find_package(Qt6 REQUIRED COMPONENTS Gui Quick Svg)
 qt_standard_project_setup()
 
 add_subdirectory(src)

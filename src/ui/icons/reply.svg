@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="9,17 4,12 9,7"/>
+    <path d="M20 18V11C20 9.89543 19.1046 9 18 9H4"/>
+  </g>
+</svg>
