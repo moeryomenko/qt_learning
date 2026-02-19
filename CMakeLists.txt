@@ -35,7 +35,22 @@ if(USE_CONAN)
   conan_basic_setup()
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Gui Quick Svg)
+find_package(Qt6 REQUIRED COMPONENTS Gui Quick Svg Network WebSockets DBus Test Multimedia)
 qt_standard_project_setup()
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GST REQUIRED
+  gstreamer-1.0
+  gstreamer-webrtc-1.0
+  gstreamer-sdp-1.0
+  gstreamer-video-1.0
+  gstreamer-app-1.0
+)
+pkg_check_modules(PW REQUIRED
+  libpipewire-0.3
+)
+
+option(BUILD_TESTING "Build test executables" ON)
+include(CTest)
 
 add_subdirectory(src)
