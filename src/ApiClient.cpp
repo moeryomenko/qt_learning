@@ -13,13 +13,14 @@ ApiClient::ApiClient(QObject *parent)
   qDebug() << Q_FUNC_INFO << "ApiClient created, base URL:" << m_baseUrl;
 
   // Allow self-signed certificates (dev/staging servers)
-  connect(&m_nam, &QNetworkAccessManager::sslErrors,
-          this, [](QNetworkReply* reply, const QList<QSslError>& errors) {
-    qWarning() << Q_FUNC_INFO << "[FIX] Ignoring SSL errors for self-signed cert:";
-    for (const auto& e : errors)
-        qWarning() << Q_FUNC_INFO << "  " << e.errorString();
-    reply->ignoreSslErrors(errors);
-  });
+  connect(&m_nam, &QNetworkAccessManager::sslErrors, this,
+          [](QNetworkReply *reply, const QList<QSslError> &errors) {
+            qWarning() << Q_FUNC_INFO
+                       << "[FIX] Ignoring SSL errors for self-signed cert:";
+            for (const auto &e : errors)
+              qWarning() << Q_FUNC_INFO << "  " << e.errorString();
+            reply->ignoreSslErrors(errors);
+          });
 }
 
 void ApiClient::setBaseUrl(const QString &url) {
@@ -237,14 +238,15 @@ void ApiClient::listRooms() {
       if (v.isObject()) {
         const RoomInfo r = parseRoom(v.toObject());
         QVariantMap m;
-        m["id"]        = r.id;
-        m["name"]      = r.name;
+        m["id"] = r.id;
+        m["name"] = r.name;
         m["createdAt"] = r.createdAt;
         m["roommates"] = QVariant::fromValue(r.roommates);
         varRooms << m;
       }
     }
-    qDebug() << Q_FUNC_INFO << "[FIX] Emitting" << varRooms.size() << "rooms as QVariantList";
+    qDebug() << Q_FUNC_INFO << "[FIX] Emitting" << varRooms.size()
+             << "rooms as QVariantList";
     emit roomsReceived(varRooms);
   });
 }
@@ -274,11 +276,13 @@ void ApiClient::createRoom(const QString &name) {
     }
     const RoomInfo room = parseRoom(doc.object());
     QVariantMap varRoom;
-    varRoom["id"]        = room.id;
-    varRoom["name"]      = room.name;
+    varRoom["id"] = room.id;
+    varRoom["name"] = room.name;
     varRoom["createdAt"] = room.createdAt;
     varRoom["roommates"] = QVariant::fromValue(room.roommates);
-    qDebug() << Q_FUNC_INFO << "[FIX] Emitting created room as QVariantMap id:" << room.id << "name:" << room.name;
+    qDebug() << Q_FUNC_INFO
+             << "[FIX] Emitting created room as QVariantMap id:" << room.id
+             << "name:" << room.name;
     emit roomCreated(varRoom);
   });
 }

@@ -14,25 +14,76 @@ if(CCACHE_PROGRAM)
   set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
 endif()
 
-if(USE_CONAN)
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    message(
-      STATUS
-        "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+# Formatting target
+find_program(CLANG_FORMAT_EXECUTABLE NAMES clang-format)
+if(CLANG_FORMAT_EXECUTABLE)
+  file(
+    GLOB_RECURSE
+    ALL_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
+  )
 
-    file(
-      DOWNLOAD
-      "https://raw.githubusercontent.com/conan-io/cmake-conan/release/0.18.1/conan.cmake"
-      "${CMAKE_BINARY_DIR}/conan.cmake")
-  endif()
+  add_custom_target(
+    format
+    COMMAND ${CLANG_FORMAT_EXECUTABLE} -style=file ${ALL_SOURCE_FILES}
+    COMMENT "Running clang-format on source files"
+    VERBATIM
+  )
 
-  include(${CMAKE_BINARY_DIR}/conan.cmake)
+  message(STATUS "clang-format found: ${CLANG_FORMAT_EXECUTABLE}")
+  message(STATUS "  Run 'cmake --build . --target format' to format code")
+else()
+  message(STATUS "clang-format not found - format target not available")
+endif()
 
-  conan_cmake_run(CONANFILE conanfile.txt BASIC_SETUP CMAKE_TARGETS BUILD
-                  missing)
+# Linting target
+find_program(CLANG_TIDY_EXECUTABLE NAMES clang-tidy)
+if(CLANG_TIDY_EXECUTABLE)
+  file(
+    GLOB_RECURSE
+    ALL_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp
+  )
 
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  conan_basic_setup()
+  add_custom_target(
+    lint
+    COMMAND
+    ${CLANG_TIDY_EXECUTABLE}
+    -p
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${ALL_SOURCE_FILES}
+    --
+    -std=c++23
+    -I${CMAKE_CURRENT_SOURCE_DIR}/include
+    COMMENT "Running clang-tidy on source files"
+    VERBATIM
+  )
+
+  add_custom_target(
+    lint-fix
+    COMMAND
+    ${CLANG_TIDY_EXECUTABLE}
+    -p
+    ${CMAKE_CURRENT_BINARY_DIR}
+    -fix
+    ${ALL_SOURCE_FILES}
+    --
+    -std=c++23
+    -I${CMAKE_CURRENT_SOURCE_DIR}/include
+    COMMENT "Running clang-tidy with auto-fix on source files"
+    VERBATIM
+  )
+
+  message(STATUS "clang-tidy found: ${CLANG_TIDY_EXECUTABLE}")
+  message(STATUS "  Run 'cmake --build . --target lint' to lint code")
+  message(
+    STATUS "  Run 'cmake --build . --target lint-fix' to lint and auto-fix code"
+  )
+else()
+  message(STATUS "clang-tidy not found - lint target not available")
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Gui Quick Svg Network WebSockets DBus Test Multimedia)
