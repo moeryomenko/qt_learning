@@ -20,14 +20,13 @@ if(CLANG_FORMAT_EXECUTABLE)
   file(
     GLOB_RECURSE
     ALL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
   )
 
   add_custom_target(
     format
-    COMMAND ${CLANG_FORMAT_EXECUTABLE} -style=file ${ALL_SOURCE_FILES}
+    COMMAND ${CLANG_FORMAT_EXECUTABLE} -i -style=file ${ALL_SOURCE_FILES}
     COMMENT "Running clang-format on source files"
     VERBATIM
   )
@@ -44,8 +43,8 @@ if(CLANG_TIDY_EXECUTABLE)
   file(
     GLOB_RECURSE
     ALL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
   )
 
   add_custom_target(
@@ -57,7 +56,7 @@ if(CLANG_TIDY_EXECUTABLE)
     ${ALL_SOURCE_FILES}
     --
     -std=c++23
-    -I${CMAKE_CURRENT_SOURCE_DIR}/include
+    -I${CMAKE_CURRENT_SOURCE_DIR}/src
     COMMENT "Running clang-tidy on source files"
     VERBATIM
   )

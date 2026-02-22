@@ -16,77 +16,75 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <gst/gst.h>
+#include <pipewire/pipewire.h>
+
 #include <QDebug>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQmlEngine>
 
-#include "VideoTile.h"
-
-#include <gst/gst.h>
-#include <pipewire/pipewire.h>
-
 #include "ApiClient.h"
 #include "PipeWireNodeModel.h"
 #include "PortalScreencast.h"
 #include "SignalingClient.h"
+#include "VideoTile.h"
 #include "WebRtcPeerManager.h"
 
 // Convert an HTTP(S) base URL to a WebSocket base URL
-static QString toWsUrl(const QString &httpUrl) {
-  if (httpUrl.startsWith(QLatin1String("https://")))
+static QString toWsUrl(const QString& httpUrl) {
+  if (httpUrl.startsWith(QLatin1String("https://"))) {
     return QStringLiteral("wss://") + httpUrl.mid(8);
-  if (httpUrl.startsWith(QLatin1String("http://")))
+  }
+
+  if (httpUrl.startsWith(QLatin1String("http://"))) {
     return QStringLiteral("ws://") + httpUrl.mid(7);
-  return httpUrl; // already ws:// or wss://
+  }
+
+  return httpUrl;  // already ws:// or wss://
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   using namespace Qt::StringLiterals;
 
   // Initialize GStreamer before creating QGuiApplication so it can consume
   // its own argv entries without interfering with Qt's argv parsing.
   gst_init(&argc, &argv);
-  qDebug() << Q_FUNC_INFO
-           << "GStreamer initialized, version:" << gst_version_string();
+  qDebug() << Q_FUNC_INFO << "GStreamer initialized, version:" << gst_version_string();
 
   // Initialize PipeWire (used by PipeWireNodeModel and pipewiresrc)
   pw_init(&argc, &argv);
-  qDebug() << Q_FUNC_INFO
-           << "PipeWire initialized, version:" << pw_get_library_version();
+  qDebug() << Q_FUNC_INFO << "PipeWire initialized, version:" << pw_get_library_version();
 
   QGuiApplication app(argc, argv);
-  app.setApplicationName(u"QtWebRTCChat"_s);
-  app.setOrganizationName(u"QtLearning"_s);
+  QGuiApplication::setApplicationName(u"QtWebRTCChat"_s);
+  QGuiApplication::setOrganizationName(u"QtLearning"_s);
 
   // -----------------------------------------------------------------------
   // Backend objects
   // -----------------------------------------------------------------------
-  ApiClient apiClient;
-  SignalingClient signalingClient;
+  ApiClient         apiClient;
+  SignalingClient   signalingClient;
   WebRtcPeerManager rtcManager;
-  PortalScreencast portalScreencast;
+  PortalScreencast  portalScreencast;
   PipeWireNodeModel pipeWireNodeModel;
 
   // Default server — override at runtime via APP_SERVER_URL env var
-  const QString kDefaultServer =
-      qEnvironmentVariable("APP_SERVER_URL", "https://213.171.25.246");
+  const QString kDefaultServer = qEnvironmentVariable("APP_SERVER_URL", "https://213.171.25.246");
   apiClient.setBaseUrl(kDefaultServer);
   qDebug() << Q_FUNC_INFO << "Default server:" << kDefaultServer << "(source:"
-           << (qEnvironmentVariableIsSet("APP_SERVER_URL")
-                   ? "APP_SERVER_URL env"
-                   : "built-in default")
+           << (qEnvironmentVariableIsSet("APP_SERVER_URL") ? "APP_SERVER_URL env"
+                                                           : "built-in default")
            << ")";
 
   // -----------------------------------------------------------------------
   // ApiClient ↔ SignalingClient
   // On successful login/register, auto-connect the signaling WebSocket.
   // -----------------------------------------------------------------------
-  auto connectSignaling = [&](const AuthTokens &tokens) {
+  auto connectSignaling = [&](const AuthTokens& tokens) {
     const QString wsUrl = toWsUrl(apiClient.baseUrl());
-    qDebug() << Q_FUNC_INFO << "Auth success — connecting signaling to"
-             << wsUrl;
+    qDebug() << Q_FUNC_INFO << "Auth success — connecting signaling to" << wsUrl;
     signalingClient.connectToServer(wsUrl, tokens.accessToken);
   };
   QObject::connect(&apiClient, &ApiClient::loginSuccess, connectSignaling);
@@ -96,18 +94,16 @@ int main(int argc, char **argv) {
   // SignalingClient ↔ WebRtcPeerManager: peer lifecycle
   // -----------------------------------------------------------------------
   QObject::connect(&signalingClient, &SignalingClient::peerJoined,
-                   [&](const QString &peerId, const QString &username) {
-                     qDebug()
-                         << Q_FUNC_INFO << "peerJoined → ensurePeer:" << peerId
-                         << "(" << username << ")";
+                   [&](const QString& peerId, const QString& username) {
+                     qDebug() << Q_FUNC_INFO << "peerJoined → ensurePeer:" << peerId << "("
+                              << username << ")";
                      rtcManager.ensurePeer(peerId);
                    });
 
-  QObject::connect(
-      &signalingClient, &SignalingClient::peerLeft, [&](const QString &peerId) {
-        qDebug() << Q_FUNC_INFO << "peerLeft → dropPeer:" << peerId;
-        rtcManager.dropPeer(peerId);
-      });
+  QObject::connect(&signalingClient, &SignalingClient::peerLeft, [&](const QString& peerId) {
+    qDebug() << Q_FUNC_INFO << "peerLeft → dropPeer:" << peerId;
+    rtcManager.dropPeer(peerId);
+  });
 
   // -----------------------------------------------------------------------
   // Inbound signaling → RTC manager
@@ -115,8 +111,8 @@ int main(int argc, char **argv) {
   QObject::connect(&signalingClient, &SignalingClient::remoteOffer, &rtcManager,
                    &WebRtcPeerManager::onRemoteOffer);
 
-  QObject::connect(&signalingClient, &SignalingClient::remoteAnswer,
-                   &rtcManager, &WebRtcPeerManager::onRemoteAnswer);
+  QObject::connect(&signalingClient, &SignalingClient::remoteAnswer, &rtcManager,
+                   &WebRtcPeerManager::onRemoteAnswer);
 
   QObject::connect(&signalingClient, &SignalingClient::remoteIce, &rtcManager,
                    &WebRtcPeerManager::onRemoteIce);
@@ -124,53 +120,53 @@ int main(int argc, char **argv) {
   // -----------------------------------------------------------------------
   // Outbound signaling ← RTC manager
   // -----------------------------------------------------------------------
-  QObject::connect(&rtcManager, &WebRtcPeerManager::localOfferReady,
-                   &signalingClient, &SignalingClient::sendOffer);
+  QObject::connect(&rtcManager, &WebRtcPeerManager::localOfferReady, &signalingClient,
+                   &SignalingClient::sendOffer);
 
-  QObject::connect(&rtcManager, &WebRtcPeerManager::localAnswerReady,
-                   &signalingClient, &SignalingClient::sendAnswer);
+  QObject::connect(&rtcManager, &WebRtcPeerManager::localAnswerReady, &signalingClient,
+                   &SignalingClient::sendAnswer);
 
-  QObject::connect(&rtcManager, &WebRtcPeerManager::localIceReady,
-                   &signalingClient, &SignalingClient::sendIce);
+  QObject::connect(&rtcManager, &WebRtcPeerManager::localIceReady, &signalingClient,
+                   &SignalingClient::sendIce);
 
   // -----------------------------------------------------------------------
   // PortalScreencast → WebRtcPeerManager: hand off PipeWire FD + node ID
   // -----------------------------------------------------------------------
   QObject::connect(&portalScreencast, &PortalScreencast::activeChanged, [&]() {
-    if (!portalScreencast.active())
+    if (!portalScreencast.active()) {
       return;
-    const int fd = portalScreencast.pipeWireFd();
+    }
+
+    const int  fd     = portalScreencast.pipeWireFd();
     const uint nodeId = portalScreencast.videoNodeId();
-    qDebug() << Q_FUNC_INFO << "PortalScreencast active — fd:" << fd
-             << "nodeId:" << nodeId;
-    if (rtcManager.running())
+    qDebug() << Q_FUNC_INFO << "PortalScreencast active — fd:" << fd << "nodeId:" << nodeId;
+
+    if (rtcManager.running()) {
       rtcManager.switchToScreen(fd, nodeId);
-    else
+    } else {
       rtcManager.startWithScreen(fd, nodeId);
+    }
   });
 
   // -----------------------------------------------------------------------
   // Log RTC info / errors to console
   // -----------------------------------------------------------------------
-  QObject::connect(
-      &rtcManager, &WebRtcPeerManager::info,
-      [](const QString &msg) { qDebug() << "[rtcManager]" << msg; });
-  QObject::connect(
-      &rtcManager, &WebRtcPeerManager::error,
-      [](const QString &msg) { qWarning() << "[rtcManager] ERROR:" << msg; });
+  QObject::connect(&rtcManager, &WebRtcPeerManager::info,
+                   [](const QString& msg) { qDebug() << "[rtcManager]" << msg; });
+  QObject::connect(&rtcManager, &WebRtcPeerManager::error,
+                   [](const QString& msg) { qWarning() << "[rtcManager] ERROR:" << msg; });
 
   QObject::connect(&portalScreencast, &PortalScreencast::info,
-                   [](const QString &msg) { qDebug() << "[portal]" << msg; });
-  QObject::connect(
-      &portalScreencast, &PortalScreencast::error,
-      [](const QString &msg) { qWarning() << "[portal] ERROR:" << msg; });
+                   [](const QString& msg) { qDebug() << "[portal]" << msg; });
+  QObject::connect(&portalScreencast, &PortalScreencast::error,
+                   [](const QString& msg) { qWarning() << "[portal] ERROR:" << msg; });
 
   // -----------------------------------------------------------------------
   // QML engine
   // -----------------------------------------------------------------------
   QQmlApplicationEngine engine;
 
-  QQmlContext *ctx = engine.rootContext();
+  QQmlContext* ctx = engine.rootContext();
   ctx->setContextProperty(u"apiClient"_s, &apiClient);
   ctx->setContextProperty(u"signalingClient"_s, &signalingClient);
   ctx->setContextProperty(u"rtcManager"_s, &rtcManager);
@@ -187,7 +183,7 @@ int main(int argc, char **argv) {
   const QUrl url(u"qrc:/pages/main.qml"_s);
   QObject::connect(
       &engine, &QQmlApplicationEngine::objectCreated, &app,
-      [&url](QObject *obj, const QUrl &objUrl) {
+      [&url](QObject* obj, const QUrl& objUrl) {
         if (!obj && url == objUrl) {
           qCritical() << "[main] QML root failed to load:" << url;
           QCoreApplication::exit(-1);
@@ -198,7 +194,7 @@ int main(int argc, char **argv) {
   engine.load(url);
 
   qDebug() << Q_FUNC_INFO << "Entering event loop";
-  const int result = app.exec();
+  const int result = QGuiApplication::exec();
   qDebug() << Q_FUNC_INFO << "Event loop exited:" << result;
 
   // Stop GStreamer pipeline before tearing down PipeWire

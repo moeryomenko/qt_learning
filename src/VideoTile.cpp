@@ -4,13 +4,13 @@
 #include <QMutexLocker>
 #include <QPainter>
 
-VideoTile::VideoTile(QQuickItem *parent) : QQuickPaintedItem(parent) {
+VideoTile::VideoTile(QQuickItem* parent) : QQuickPaintedItem(parent) {
   qDebug() << Q_FUNC_INFO << "VideoTile created";
   setRenderTarget(QQuickPaintedItem::FramebufferObject);
   setAntialiasing(false);
 }
 
-void VideoTile::setPeerId(const QString &id) {
+void VideoTile::setPeerId(const QString& id) {
   if (m_peerId == id)
     return;
   m_peerId = id;
@@ -18,7 +18,7 @@ void VideoTile::setPeerId(const QString &id) {
   emit peerIdChanged();
 }
 
-void VideoTile::setDisplayName(const QString &name) {
+void VideoTile::setDisplayName(const QString& name) {
   if (m_displayName == name)
     return;
   m_displayName = name;
@@ -52,7 +52,7 @@ void VideoTile::setHasVideo(bool v) {
   emit hasVideoChanged();
 }
 
-void VideoTile::onFrame(const QImage &frame) {
+void VideoTile::onFrame(const QImage& frame) {
   if (frame.isNull()) {
     qWarning() << Q_FUNC_INFO << "Received null frame for peer:" << m_peerId;
     return;
@@ -65,14 +65,14 @@ void VideoTile::onFrame(const QImage &frame) {
 
   if (!m_hasVideo)
     setHasVideo(true);
-  update(); // triggers paint() on Qt render thread
+  update();  // triggers paint() on Qt render thread
 }
 
-void VideoTile::paint(QPainter *painter) {
+void VideoTile::paint(QPainter* painter) {
   const QRectF bounds = boundingRect();
 
   // Background
-  painter->fillRect(bounds, QColor(0x23, 0x27, 0x2A)); // dark Discord-like bg
+  painter->fillRect(bounds, QColor(0x23, 0x27, 0x2A));  // dark Discord-like bg
 
   QImage frame;
   {
@@ -82,11 +82,10 @@ void VideoTile::paint(QPainter *painter) {
 
   if (!frame.isNull() && m_videoEnabled) {
     // Scale-to-fit preserving aspect ratio
-    const QSizeF frameSize =
-        QSizeF(frame.size()).scaled(bounds.size(), Qt::KeepAspectRatio);
+    const QSizeF frameSize = QSizeF(frame.size()).scaled(bounds.size(), Qt::KeepAspectRatio);
     const QRectF dest(bounds.x() + (bounds.width() - frameSize.width()) / 2.0,
-                      bounds.y() + (bounds.height() - frameSize.height()) / 2.0,
-                      frameSize.width(), frameSize.height());
+                      bounds.y() + (bounds.height() - frameSize.height()) / 2.0, frameSize.width(),
+                      frameSize.height());
     painter->drawImage(dest, frame);
   } else {
     // No video: draw avatar placeholder
@@ -101,15 +100,14 @@ void VideoTile::paint(QPainter *painter) {
       f.setPixelSize(qMax(12.0, r * 0.8));
       f.setBold(true);
       painter->setFont(f);
-      painter->drawText(bounds, Qt::AlignCenter,
-                        m_displayName.left(2).toUpper());
+      painter->drawText(bounds, Qt::AlignCenter, m_displayName.left(2).toUpper());
     }
   }
 
   // Muted indicator
   if (m_muted) {
     const QRectF badge(bounds.right() - 28, bounds.bottom() - 28, 22, 22);
-    painter->setBrush(QColor(0xED, 0x43, 0x45)); // red
+    painter->setBrush(QColor(0xED, 0x43, 0x45));  // red
     painter->setPen(Qt::NoPen);
     painter->drawEllipse(badge);
 
@@ -128,7 +126,7 @@ void VideoTile::paint(QPainter *painter) {
     QFont f = painter->font();
     f.setPixelSize(12);
     painter->setFont(f);
-    painter->drawText(nameBar.adjusted(6, 0, -6, 0),
-                      Qt::AlignVCenter | Qt::AlignLeft, m_displayName);
+    painter->drawText(nameBar.adjusted(6, 0, -6, 0), Qt::AlignVCenter | Qt::AlignLeft,
+                      m_displayName);
   }
 }

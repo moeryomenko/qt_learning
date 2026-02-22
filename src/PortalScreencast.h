@@ -11,18 +11,26 @@ class PortalScreencast : public QObject {
   Q_PROPERTY(int pipeWireFd READ pipeWireFd NOTIFY pipeWireFdChanged)
   Q_PROPERTY(QString lastError READ lastError NOTIFY lastErrorChanged)
 
-public:
-  explicit PortalScreencast(QObject *parent = nullptr);
+ public:
+  explicit PortalScreencast(QObject* parent = nullptr);
 
-  bool active() const { return m_active; }
-  uint videoNodeId() const { return m_videoNodeId; }
-  int pipeWireFd() const { return m_pipeWireFd; }
-  QString lastError() const { return m_lastError; }
+  bool active() const {
+    return m_active;
+  }
+  uint videoNodeId() const {
+    return m_videoNodeId;
+  }
+  int pipeWireFd() const {
+    return m_pipeWireFd;
+  }
+  QString lastError() const {
+    return m_lastError;
+  }
 
   Q_INVOKABLE void startScreenCast();
   Q_INVOKABLE void stop();
 
-signals:
+ signals:
   void activeChanged();
   void videoNodeIdChanged();
   void pipeWireFdChanged();
@@ -30,23 +38,23 @@ signals:
   void info(QString message);
   void error(QString message);
 
-private slots:
+ private slots:
   // Invoked by QDBusConnection::connect for portal Request "Response" signals
-  void handleCreateSessionResponse(uint response, const QVariantMap &results);
-  void handleSelectSourcesResponse(uint response, const QVariantMap &results);
-  void handleStartResponse(uint response, const QVariantMap &results);
+  void handleCreateSessionResponse(uint response, const QVariantMap& results);
+  void handleSelectSourcesResponse(uint response, const QVariantMap& results);
+  void handleStartResponse(uint response, const QVariantMap& results);
 
-private:
-  void setError(const QString &e);
+ private:
+  void setError(const QString& e);
   void createSession();
   void selectSources();
   void startSession();
   void openPipeWireRemote();
 
-private:
-  bool m_active = false;
+ private:
+  bool    m_active = false;
   QString m_lastError;
   QString m_sessionHandle;
-  uint m_videoNodeId = 0;
-  int m_pipeWireFd = -1;
+  uint    m_videoNodeId = 0;
+  int     m_pipeWireFd  = -1;
 };

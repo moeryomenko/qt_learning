@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QImage>
-#include <QObject>
-#include <QString>
-
 #include <gst/app/gstappsink.h>
 #include <gst/gst.h>
 #include <gst/video/video.h>
+
+#include <QImage>
+#include <QObject>
+#include <QString>
 
 // Thread-safe bridge from a GStreamer appsink to Qt signals.
 // Lives on the Qt main thread; the on_new_sample callback runs on the GStreamer
@@ -17,27 +17,31 @@ class VideoFrameSink : public QObject {
 
   Q_PROPERTY(QString peerId READ peerId WRITE setPeerId NOTIFY peerIdChanged)
 
-public:
-  explicit VideoFrameSink(QObject *parent = nullptr);
+ public:
+  explicit VideoFrameSink(QObject* parent = nullptr);
   ~VideoFrameSink() override;
 
   // Call this ONCE after construction to get the GstElement* to add to a
   // pipeline. Ownership stays with this object (ref held via gst_object_ref).
-  GstElement *element() const { return m_appsink; }
+  GstElement* element() const {
+    return m_appsink;
+  }
 
-  QString peerId() const { return m_peerId; }
-  void setPeerId(const QString &id);
+  QString peerId() const {
+    return m_peerId;
+  }
+  void setPeerId(const QString& id);
 
-signals:
+ signals:
   void peerIdChanged();
   // Emitted on the Qt main thread when a new video frame arrives.
   void frameReady(QImage frame);
 
-private:
-  static GstFlowReturn on_new_sample(GstAppSink *sink, gpointer user_data);
-  QImage convertSample(GstSample *sample);
+ private:
+  static GstFlowReturn on_new_sample(GstAppSink* sink, gpointer user_data);
+  QImage               convertSample(GstSample* sample);
 
-private:
-  GstElement *m_appsink = nullptr;
-  QString m_peerId;
+ private:
+  GstElement* m_appsink = nullptr;
+  QString     m_peerId;
 };

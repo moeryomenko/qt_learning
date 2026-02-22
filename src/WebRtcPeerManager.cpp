@@ -430,33 +430,6 @@ void WebRtcPeerManager::onVideoFrame(const QVideoFrame& frame) {
 }
 
 void WebRtcPeerManager::onAudioDataReady() {
-  // This method will be implemented to handle audio data from microphone
-  // For now, we're just marking the function signature for future implementation
-  qDebug() << "[WebRtcPeerManager] Audio data ready callback called";
-}
-if (img.format() != QImage::Format_RGBA8888)
-  img = img.convertToFormat(QImage::Format_RGBA8888);
-
-const qsizetype byteCount = img.sizeInBytes();
-GstBuffer*      buf       = gst_buffer_new_allocate(nullptr, byteCount, nullptr);
-
-GstMapInfo map;
-if (!gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
-  qWarning() << "[WebRtcPeerManager] onVideoFrame: gst_buffer_map failed";
-  gst_buffer_unref(buf);
-  return;
-}
-memcpy(map.data, img.constBits(), byteCount);
-gst_buffer_unmap(buf, &map);
-
-// appsrc takes ownership of buf regardless of return value
-const GstFlowReturn ret = gst_app_src_push_buffer(GST_APP_SRC(m_appsrc), buf);
-if (ret != GST_FLOW_OK) {
-  qWarning() << "[WebRtcPeerManager] onVideoFrame: push_buffer returned:" << ret;
-}
-}
-
-void WebRtcPeerManager::onAudioDataReady() {
   if (!m_running || !m_audioIODevice)
     return;
 
@@ -468,27 +441,6 @@ void WebRtcPeerManager::onAudioDataReady() {
   // For now, we'll just log that audio data is available
   // In a full implementation, this would push data to GStreamer pipeline
   qDebug() << "[WebRtcPeerManager] Audio data ready, size:" << data.size();
-}
-if (img.format() != QImage::Format_RGBA8888)
-  img = img.convertToFormat(QImage::Format_RGBA8888);
-
-const qsizetype byteCount = img.sizeInBytes();
-GstBuffer*      buf       = gst_buffer_new_allocate(nullptr, byteCount, nullptr);
-
-GstMapInfo map;
-if (!gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
-  qWarning() << "[WebRtcPeerManager] onVideoFrame: gst_buffer_map failed";
-  gst_buffer_unref(buf);
-  return;
-}
-memcpy(map.data, img.constBits(), byteCount);
-gst_buffer_unmap(buf, &map);
-
-// appsrc takes ownership of buf regardless of return value
-const GstFlowReturn ret = gst_app_src_push_buffer(GST_APP_SRC(m_appsrc), buf);
-if (ret != GST_FLOW_OK) {
-  qWarning() << "[WebRtcPeerManager] onVideoFrame: push_buffer returned:" << ret;
-}
 }
 
 // ---------- pipeline build/teardown ------------------------------------------
