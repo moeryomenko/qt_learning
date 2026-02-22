@@ -79,8 +79,9 @@ class TstSignalingClient : public QObject {
     result.selfId             = msg.value("from").toString();
     const QJsonObject payload = msg.value("payload").toObject();
     const QJsonObject mates   = payload.value("room_mates").toObject();
-    for (auto it = mates.begin(); it != mates.end(); ++it)
+    for (auto it = mates.begin(); it != mates.end(); ++it) {
       result.roomMates.insert(it.key(), it.value().toString());
+    }
     return result;
   }
 
@@ -89,7 +90,7 @@ class TstSignalingClient : public QObject {
   };
 
   static ParsedPeerJoined parsePeerJoined(const QJsonObject& msg) {
-    return {msg.value("from").toString(), msg.value("username").toString()};
+    return {.peerId = msg.value("from").toString(), .username = msg.value("username").toString()};
   }
 
   struct ParsedOffer {
@@ -97,7 +98,8 @@ class TstSignalingClient : public QObject {
   };
 
   static ParsedOffer parseOffer(const QJsonObject& msg) {
-    return {msg.value("from").toString(), msg.value("payload").toObject().value("sdp").toString()};
+    return {.fromPeerId = msg.value("from").toString(),
+            .sdp        = msg.value("payload").toObject().value("sdp").toString()};
   }
 
   static IceCandidate parseIce(const QJsonObject& msg) {
@@ -114,7 +116,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 1: Serialize join message
   // -----------------------------------------------------------------------
-  void test_serialize_join() {
+  static void test_serialize_join() {
     qDebug() << Q_FUNC_INFO;
     const auto obj = makeJoin("room-42", "alice");
     QCOMPARE(obj.value("type").toString(), QString("join"));
@@ -126,7 +128,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 2: Serialize offer message (nested payload)
   // -----------------------------------------------------------------------
-  void test_serialize_offer() {
+  static void test_serialize_offer() {
     qDebug() << Q_FUNC_INFO;
     const auto obj = makeOffer("peer-99", "v=0\r\no=...");
     QCOMPARE(obj.value("type").toString(), QString("offer"));
@@ -140,7 +142,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 3: Serialize answer message
   // -----------------------------------------------------------------------
-  void test_serialize_answer() {
+  static void test_serialize_answer() {
     qDebug() << Q_FUNC_INFO;
     const auto obj = makeAnswer("peer-77", "v=0\r\no=answer");
     QCOMPARE(obj.value("type").toString(), QString("answer"));
@@ -151,7 +153,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 4: Serialize ICE candidate (sdpMid + sdpMLineIndex)
   // -----------------------------------------------------------------------
-  void test_serialize_ice() {
+  static void test_serialize_ice() {
     qDebug() << Q_FUNC_INFO;
     IceCandidate ice;
     ice.candidate     = "candidate:1 1 udp 2113667327 10.0.0.1 54321 typ host";
@@ -171,7 +173,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 5: Parse "joined" server message (room_mates map)
   // -----------------------------------------------------------------------
-  void test_parse_joined() {
+  static void test_parse_joined() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject mates;
     mates["client-a"] = "Alice";
@@ -195,7 +197,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 6: Parse "peer-joined" message
   // -----------------------------------------------------------------------
-  void test_parse_peerJoined() {
+  static void test_parse_peerJoined() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject msg;
     msg["type"]     = "peer-joined";
@@ -211,7 +213,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 7: Parse incoming offer
   // -----------------------------------------------------------------------
-  void test_parse_offer() {
+  static void test_parse_offer() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject payload;
     payload["sdp"]  = "v=0\r\no=offersdp";
@@ -231,7 +233,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 8: Parse incoming ICE candidate
   // -----------------------------------------------------------------------
-  void test_parse_ice() {
+  static void test_parse_ice() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject payload;
     payload["candidate"]     = "candidate:1 1 udp 12345 192.168.1.1 40000 typ host";
@@ -253,7 +255,7 @@ class TstSignalingClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 9: Parse "leave" message (no payload needed)
   // -----------------------------------------------------------------------
-  void test_parse_leave() {
+  static void test_parse_leave() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject msg;
     msg["type"] = "leave";

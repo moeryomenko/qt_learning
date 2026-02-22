@@ -1,4 +1,4 @@
-#include "PortalScreencast.h"
+#include "PortalScreencast.hh"
 
 #include <QDBusArgument>
 #include <QDBusConnection>
@@ -45,8 +45,9 @@ void PortalScreencast::startScreenCast() {
 
 void PortalScreencast::stop() {
   qDebug() << Q_FUNC_INFO << "Stopping. sessionHandle:" << m_sessionHandle;
-  if (!m_active && m_sessionHandle.isEmpty())
+  if (!m_active && m_sessionHandle.isEmpty()) {
     return;
+  }
 
   if (!m_sessionHandle.isEmpty()) {
     QDBusMessage msg =
@@ -145,7 +146,7 @@ void PortalScreencast::selectSources() {
           });
 }
 
-void PortalScreencast::handleSelectSourcesResponse(uint response, const QVariantMap&) {
+void PortalScreencast::handleSelectSourcesResponse(uint response, const QVariantMap& /*unused*/) {
   qDebug() << Q_FUNC_INFO << "response:" << response;
   if (response != 0) {
     setError(QString("SelectSources rejected (%1)").arg(response));
@@ -207,8 +208,9 @@ void PortalScreencast::handleStartResponse(uint response, const QVariantMap& res
       arg.endStructure();
       qDebug() << Q_FUNC_INFO << "[FIX] Stream" << streamCount << "node id:" << nodeId
                << "props:" << props;
-      if (!videoNode)
+      if (videoNode == 0U) {
         videoNode = nodeId;
+      }
       ++streamCount;
     }
     arg.endArray();
@@ -219,15 +221,17 @@ void PortalScreencast::handleStartResponse(uint response, const QVariantMap& res
     qDebug() << Q_FUNC_INFO << "[FIX] Fallback QVariantList streams count:" << streams.size();
     for (const QVariant& s : streams) {
       const QVariantList pair = s.toList();
-      if (pair.size() < 2)
+      if (pair.size() < 2) {
         continue;
+      }
       uint nodeId = pair[0].toUInt();
-      if (!videoNode)
+      if (videoNode == 0U) {
         videoNode = nodeId;
+      }
     }
   }
 
-  if (!videoNode) {
+  if (videoNode == 0U) {
     setError("Portal did not return video node id");
     return;
   }

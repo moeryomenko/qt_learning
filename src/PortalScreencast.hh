@@ -14,16 +14,16 @@ class PortalScreencast : public QObject {
  public:
   explicit PortalScreencast(QObject* parent = nullptr);
 
-  bool active() const {
+  [[nodiscard]] bool active() const {
     return m_active;
   }
-  uint videoNodeId() const {
+  [[nodiscard]] uint videoNodeId() const {
     return m_videoNodeId;
   }
-  int pipeWireFd() const {
+  [[nodiscard]] int pipeWireFd() const {
     return m_pipeWireFd;
   }
-  QString lastError() const {
+  [[nodiscard]] QString lastError() const {
     return m_lastError;
   }
 
@@ -44,7 +44,6 @@ class PortalScreencast : public QObject {
   void handleSelectSourcesResponse(uint response, const QVariantMap& results);
   void handleStartResponse(uint response, const QVariantMap& results);
 
- private:
   void setError(const QString& e);
   void createSession();
   void selectSources();

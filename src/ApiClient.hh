@@ -35,21 +35,21 @@ class ApiClient : public QObject {
  public:
   explicit ApiClient(QObject* parent = nullptr);
 
-  QString baseUrl() const {
+  [[nodiscard]] QString baseUrl() const {
     return m_baseUrl;
   }
   void setBaseUrl(const QString& url);
 
-  bool authenticated() const {
+  [[nodiscard]] bool authenticated() const {
     return !m_tokens.accessToken.isEmpty();
   }
-  QString username() const {
+  [[nodiscard]] QString username() const {
     return m_username;
   }
-  QString accessToken() const {
+  [[nodiscard]] QString accessToken() const {
     return m_tokens.accessToken;
   }
-  QString refreshToken() const {
+  [[nodiscard]] QString refreshToken() const {
     return m_tokens.refreshToken;
   }
 
@@ -84,12 +84,12 @@ class ApiClient : public QObject {
   void apiError(const QString& message);
 
  private:
-  QNetworkRequest buildRequest(const QString& path) const;
-  void            setTokens(const AuthTokens& tokens, const QString& username = {});
-  void            handleAuthReply(QNetworkReply* reply, bool isRegister = false);
-  AuthTokens      parseTokens(const QJsonObject& obj) const;
-  RoomInfo        parseRoom(const QJsonObject& obj) const;
-  QString         extractError(QNetworkReply* reply) const;
+  [[nodiscard]] QNetworkRequest buildRequest(const QString& path) const;
+  void                          setTokens(const AuthTokens& tokens, const QString& username = {});
+  void                          handleAuthReply(QNetworkReply* reply, bool isRegister = false);
+  [[nodiscard]] AuthTokens      parseTokens(const QJsonObject& obj) const;
+  [[nodiscard]] RoomInfo        parseRoom(const QJsonObject& obj) const;
+  QString                       extractError(QNetworkReply* reply) const;
 
  private:
   QNetworkAccessManager m_nam;

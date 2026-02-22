@@ -1,4 +1,4 @@
-#include "VideoTile.h"
+#include "VideoTile.hh"
 
 #include <QDebug>
 #include <QMutexLocker>
@@ -11,24 +11,29 @@ VideoTile::VideoTile(QQuickItem* parent) : QQuickPaintedItem(parent) {
 }
 
 void VideoTile::setPeerId(const QString& id) {
-  if (m_peerId == id)
+  if (m_peerId == id) {
     return;
+  }
+
   m_peerId = id;
   qDebug() << Q_FUNC_INFO << "peerId:" << id;
   emit peerIdChanged();
 }
 
 void VideoTile::setDisplayName(const QString& name) {
-  if (m_displayName == name)
+  if (m_displayName == name) {
     return;
+  }
+
   m_displayName = name;
   qDebug() << Q_FUNC_INFO << "displayName:" << name;
   emit displayNameChanged();
 }
 
 void VideoTile::setMuted(bool m) {
-  if (m_muted == m)
+  if (m_muted == m) {
     return;
+  }
   m_muted = m;
   qDebug() << Q_FUNC_INFO << "muted:" << m << "peer:" << m_peerId;
   emit mutedChanged();
@@ -36,8 +41,9 @@ void VideoTile::setMuted(bool m) {
 }
 
 void VideoTile::setVideoEnabled(bool e) {
-  if (m_videoEnabled == e)
+  if (m_videoEnabled == e) {
     return;
+  }
   m_videoEnabled = e;
   qDebug() << Q_FUNC_INFO << "videoEnabled:" << e << "peer:" << m_peerId;
   emit videoEnabledChanged();
@@ -45,8 +51,9 @@ void VideoTile::setVideoEnabled(bool e) {
 }
 
 void VideoTile::setHasVideo(bool v) {
-  if (m_hasVideo == v)
+  if (m_hasVideo == v) {
     return;
+  }
   m_hasVideo = v;
   qDebug() << Q_FUNC_INFO << "hasVideo:" << v << "peer:" << m_peerId;
   emit hasVideoChanged();
@@ -63,8 +70,9 @@ void VideoTile::onFrame(const QImage& frame) {
     m_currentFrame = frame;
   }
 
-  if (!m_hasVideo)
+  if (!m_hasVideo) {
     setHasVideo(true);
+  }
   update();  // triggers paint() on Qt render thread
 }
 
@@ -83,9 +91,9 @@ void VideoTile::paint(QPainter* painter) {
   if (!frame.isNull() && m_videoEnabled) {
     // Scale-to-fit preserving aspect ratio
     const QSizeF frameSize = QSizeF(frame.size()).scaled(bounds.size(), Qt::KeepAspectRatio);
-    const QRectF dest(bounds.x() + (bounds.width() - frameSize.width()) / 2.0,
-                      bounds.y() + (bounds.height() - frameSize.height()) / 2.0, frameSize.width(),
-                      frameSize.height());
+    const QRectF dest(bounds.x() + ((bounds.width() - frameSize.width()) / 2.0),
+                      bounds.y() + ((bounds.height() - frameSize.height()) / 2.0),
+                      frameSize.width(), frameSize.height());
     painter->drawImage(dest, frame);
   } else {
     // No video: draw avatar placeholder

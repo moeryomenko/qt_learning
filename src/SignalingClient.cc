@@ -1,4 +1,4 @@
-#include "SignalingClient.h"
+#include "SignalingClient.hh"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -17,8 +17,9 @@ SignalingClient::SignalingClient(QObject* parent) : QObject(parent) {
   // Allow self-signed certificates (dev/staging servers)
   connect(&m_ws, &QWebSocket::sslErrors, this, [this](const QList<QSslError>& errors) {
     qWarning() << Q_FUNC_INFO << "[FIX] Ignoring SSL errors for self-signed cert:";
-    for (const auto& e : errors)
+    for (const auto& e : errors) {
       qWarning() << Q_FUNC_INFO << "  " << e.errorString();
+    }
     m_ws.ignoreSslErrors(errors);
   });
 
@@ -33,8 +34,9 @@ void SignalingClient::connectToServer(const QString& wsBaseUrl, const QString& t
   resetReconnect();
 
   QString url = wsBaseUrl + "/api/v1/ws";
-  if (!token.isEmpty())
+  if (!token.isEmpty()) {
     url += "?token=" + token;
+  }
 
   qDebug() << Q_FUNC_INFO << "Opening WebSocket:" << url;
   m_ws.open(QUrl(url));
@@ -193,8 +195,9 @@ void SignalingClient::onReconnectTimeout() {
            << kMaxReconnectAttempts;
 
   QString url = m_serverUrl + "/api/v1/ws";
-  if (!m_token.isEmpty())
+  if (!m_token.isEmpty()) {
     url += "?token=" + m_token;
+  }
   m_ws.open(QUrl(url));
 }
 
@@ -217,10 +220,12 @@ void SignalingClient::sendJson(const QJsonObject& obj) {
 }
 
 void SignalingClient::scheduleReconnect() {
-  if (m_serverUrl.isEmpty())
+  if (m_serverUrl.isEmpty()) {
     return;
-  if (m_reconnectAttempts >= kMaxReconnectAttempts)
+  }
+  if (m_reconnectAttempts >= kMaxReconnectAttempts) {
     return;
+  }
 
   // Exponential backoff: 1s, 2s, 4s, 8s, 16s (capped at 30s)
   const int delayMs =

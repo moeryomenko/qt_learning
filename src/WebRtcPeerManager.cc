@@ -1,4 +1,4 @@
-#include "WebRtcPeerManager.h"
+#include "WebRtcPeerManager.hh"
 
 #include <gst/app/gstappsrc.h>
 #include <gst/sdp/sdp.h>
@@ -17,7 +17,8 @@
 #include <QVideoFrame>
 #include <QVideoSink>
 
-#include "VideoTile.h"
+#include "SignalingClient.hh"
+#include "VideoTile.hh"
 
 // ---------- helpers -----------------------------------------------------------
 

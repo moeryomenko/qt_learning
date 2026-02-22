@@ -25,12 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QQmlContext>
 #include <QQmlEngine>
 
-#include "ApiClient.h"
-#include "PipeWireNodeModel.h"
-#include "PortalScreencast.h"
-#include "SignalingClient.h"
-#include "VideoTile.h"
-#include "WebRtcPeerManager.h"
+#include "ApiClient.hh"
+#include "PipeWireNodeModel.hh"
+#include "PortalScreencast.hh"
+#include "SignalingClient.hh"
+#include "VideoTile.hh"
+#include "WebRtcPeerManager.hh"
 
 // Convert an HTTP(S) base URL to a WebSocket base URL
 static QString toWsUrl(const QString& httpUrl) {

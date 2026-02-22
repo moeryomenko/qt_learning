@@ -1,4 +1,4 @@
-#include "PipeWireNodeModel.h"
+#include "PipeWireNodeModel.hh"
 
 #include <QDebug>
 #include <QMetaObject>
@@ -6,18 +6,20 @@
 static constexpr const char* PW_NODE_TYPE = "PipeWire:Interface:Node";
 
 static QString pw_prop(const spa_dict* dict, const char* key) {
-  if (!dict)
+  if (dict == nullptr) {
     return {};
+  }
   const char* v = spa_dict_lookup(dict, key);
-  return v ? QString::fromUtf8(v) : QString{};
+  return (v != nullptr) ? QString::fromUtf8(v) : QString{};
 }
 
 // --- Registry callbacks (run on PW thread) ---
 
 static void on_global(void* data, uint32_t id, uint32_t /*perms*/, const char* type,
                       uint32_t /*version*/, const spa_dict* props) {
-  if (!type || QString::fromUtf8(type) != PW_NODE_TYPE)
+  if ((type == nullptr) || QString::fromUtf8(type) != PW_NODE_TYPE) {
     return;
+  }
 
   auto* self = static_cast<PipeWireNodeModel*>(data);
 
@@ -25,8 +27,9 @@ static void on_global(void* data, uint32_t id, uint32_t /*perms*/, const char* t
   n.id       = id;
   n.name     = pw_prop(props, "node.name");
   n.nodeNick = pw_prop(props, "node.nick");
-  if (n.nodeNick.isEmpty())
+  if (n.nodeNick.isEmpty()) {
     n.nodeNick = pw_prop(props, "node.description");
+  }
   n.mediaClass = pw_prop(props, "media.class");
   n.appName    = pw_prop(props, "application.name");
 
@@ -72,14 +75,16 @@ PipeWireNodeModel::~PipeWireNodeModel() {
 }
 
 int PipeWireNodeModel::rowCount(const QModelIndex& parent) const {
-  if (parent.isValid())
+  if (parent.isValid()) {
     return 0;
+  }
   return m_nodes.size();
 }
 
 QVariant PipeWireNodeModel::data(const QModelIndex& index, int role) const {
-  if (!index.isValid() || index.row() < 0 || index.row() >= m_nodes.size())
+  if (!index.isValid() || index.row() < 0 || index.row() >= m_nodes.size()) {
     return {};
+  }
   const auto& n = m_nodes[index.row()];
   switch (role) {
     case IdRole:
@@ -169,33 +174,34 @@ void PipeWireNodeModel::removeNode(uint32_t id) {
 }
 
 void PipeWireNodeModel::startEnumeration() {
-  if (m_running)
+  if (m_running) {
     return;
+  }
   qDebug() << Q_FUNC_INFO << "Starting PipeWire enumeration";
 
   m_loop = pw_thread_loop_new("pw-nodes", nullptr);
-  if (!m_loop) {
+  if (m_loop == nullptr) {
     qWarning() << Q_FUNC_INFO << "pw_thread_loop_new failed";
     emit error("Failed to create PipeWire thread loop");
     return;
   }
 
   m_ctx = pw_context_new(pw_thread_loop_get_loop(m_loop), nullptr, 0);
-  if (!m_ctx) {
+  if (m_ctx == nullptr) {
     qWarning() << Q_FUNC_INFO << "pw_context_new failed";
     emit error("Failed to create PipeWire context");
     return;
   }
 
   m_core = pw_context_connect(m_ctx, nullptr, 0);
-  if (!m_core) {
+  if (m_core == nullptr) {
     qWarning() << Q_FUNC_INFO << "pw_context_connect failed";
     emit error("Failed to connect to PipeWire");
     return;
   }
 
   m_registry = pw_core_get_registry(m_core, PW_VERSION_REGISTRY, 0);
-  if (!m_registry) {
+  if (m_registry == nullptr) {
     qWarning() << Q_FUNC_INFO << "pw_core_get_registry failed";
     emit error("Failed to get PipeWire registry");
     return;
@@ -210,26 +216,28 @@ void PipeWireNodeModel::startEnumeration() {
 }
 
 void PipeWireNodeModel::stopEnumeration() {
-  if (!m_running)
+  if (!m_running) {
     return;
+  }
   qDebug() << Q_FUNC_INFO << "Stopping PipeWire enumeration";
 
-  if (m_loop)
+  if (m_loop != nullptr) {
     pw_thread_loop_stop(m_loop);
+  }
 
-  if (m_registry) {
-    pw_proxy_destroy((pw_proxy*)m_registry);
+  if (m_registry != nullptr) {
+    pw_proxy_destroy(reinterpret_cast<pw_proxy*>(m_registry));
     m_registry = nullptr;
   }
-  if (m_core) {
+  if (m_core != nullptr) {
     pw_core_disconnect(m_core);
     m_core = nullptr;
   }
-  if (m_ctx) {
+  if (m_ctx != nullptr) {
     pw_context_destroy(m_ctx);
     m_ctx = nullptr;
   }
-  if (m_loop) {
+  if (m_loop != nullptr) {
     pw_thread_loop_destroy(m_loop);
     m_loop = nullptr;
   }

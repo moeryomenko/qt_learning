@@ -36,12 +36,12 @@ class PipeWireNodeModel : public QAbstractListModel {
   explicit PipeWireNodeModel(QObject* parent = nullptr);
   ~PipeWireNodeModel() override;
 
-  int                    rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant               data(const QModelIndex& index, int role) const override;
-  QHash<int, QByteArray> roleNames() const override;
+  [[nodiscard]] int      rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  [[nodiscard]] QVariant data(const QModelIndex& index, int role) const override;
+  [[nodiscard]] QHash<int, QByteArray> roleNames() const override;
 
-  Q_INVOKABLE void refresh();
-  Q_INVOKABLE int  findDefaultAudioMonitorId() const;
+  Q_INVOKABLE void              refresh();
+  Q_INVOKABLE [[nodiscard]] int findDefaultAudioMonitorId() const;
 
   // Called from PW thread via invokeMethod — NOT for direct external use
   void addOrUpdate(const Node& n);
@@ -55,7 +55,6 @@ class PipeWireNodeModel : public QAbstractListModel {
   void startEnumeration();
   void stopEnumeration();
 
- private:
   QVector<Node> m_nodes;
 
   pw_thread_loop* m_loop     = nullptr;

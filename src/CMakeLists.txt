@@ -1,12 +1,12 @@
 qt_add_executable(application
   main.cc
-  ApiClient.h          ApiClient.cpp
-  SignalingClient.h    SignalingClient.cpp
-  PortalScreencast.h   PortalScreencast.cpp
-  PipeWireNodeModel.h  PipeWireNodeModel.cpp
-  VideoFrameSink.h     VideoFrameSink.cpp
-  VideoTile.h          VideoTile.cpp
-  WebRtcPeerManager.h  WebRtcPeerManager.cpp
+  ApiClient.hh          ApiClient.cc
+  SignalingClient.hh    SignalingClient.cc
+  PortalScreencast.hh   PortalScreencast.cc
+  PipeWireNodeModel.hh  PipeWireNodeModel.cc
+  VideoFrameSink.hh     VideoFrameSink.cc
+  VideoTile.hh          VideoTile.cc
+  WebRtcPeerManager.hh  WebRtcPeerManager.cc
 )
 
 add_subdirectory(ui)

@@ -13,8 +13,8 @@
 #include <QString>
 #include <QVideoFrame>
 
-#include "SignalingClient.h"  // for IceCandidate
-#include "VideoFrameSink.h"
+#include "SignalingClient.hh"  // for IceCandidate
+#include "VideoFrameSink.hh"
 
 class VideoTile;
 class QScreenCapture;
@@ -41,28 +41,28 @@ class WebRtcPeerManager : public QObject {
   explicit WebRtcPeerManager(QObject* parent = nullptr);
   ~WebRtcPeerManager() override;
 
-  bool running() const {
+  [[nodiscard]] bool running() const {
     return m_running;
   }
-  int peerCount() const {
+  [[nodiscard]] int peerCount() const {
     return m_peers.size();
   }
 
-  bool micMuted() const {
+  [[nodiscard]] bool micMuted() const {
     return m_micMuted;
   }
   Q_INVOKABLE void setMicMuted(bool m);
 
-  bool cameraMuted() const {
+  [[nodiscard]] bool cameraMuted() const {
     return m_cameraMuted;
   }
   Q_INVOKABLE void setCameraMuted(bool m);
 
-  bool micAvailable() const {
+  [[nodiscard]] bool micAvailable() const {
     return m_micAvailable;
   }
 
-  VideoSourceMode videoSource() const {
+  [[nodiscard]] VideoSourceMode videoSource() const {
     return m_videoSource;
   }
 
@@ -83,8 +83,8 @@ class WebRtcPeerManager : public QObject {
   Q_INVOKABLE void dropPeer(const QString& peerId);
 
   // VideoFrameSink for a given peer (nullptr if not running)
-  VideoFrameSink* sinkForPeer(const QString& peerId) const;
-  VideoFrameSink* localSink() const {
+  [[nodiscard]] VideoFrameSink* sinkForPeer(const QString& peerId) const;
+  [[nodiscard]] VideoFrameSink* localSink() const {
     return m_localSink;
   }
 
@@ -150,7 +150,6 @@ class WebRtcPeerManager : public QObject {
 
   Peer* peerByWebrtcBin(GstElement* bin);
 
- private:
   bool            m_running      = false;
   bool            m_micMuted     = false;
   bool            m_cameraMuted  = false;

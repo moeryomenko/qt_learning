@@ -1,13 +1,13 @@
-#include "VideoFrameSink.h"
+#include "VideoFrameSink.hh"
 
 #include <QDebug>
 #include <QMetaObject>
 
-VideoFrameSink::VideoFrameSink(QObject* parent) : QObject(parent) {
+VideoFrameSink::VideoFrameSink(QObject* parent)
+    : QObject(parent), m_appsink(gst_element_factory_make("appsink", nullptr)) {
   qDebug() << Q_FUNC_INFO << "Creating appsink";
 
-  m_appsink = gst_element_factory_make("appsink", nullptr);
-  if (!m_appsink) {
+  if (m_appsink == nullptr) {
     qWarning() << Q_FUNC_INFO << "Failed to create appsink element";
     return;
   }
@@ -30,15 +30,16 @@ VideoFrameSink::VideoFrameSink(QObject* parent) : QObject(parent) {
 
 VideoFrameSink::~VideoFrameSink() {
   qDebug() << Q_FUNC_INFO << "Destroying VideoFrameSink for peer:" << m_peerId;
-  if (m_appsink) {
+  if (m_appsink != nullptr) {
     gst_object_unref(m_appsink);
     m_appsink = nullptr;
   }
 }
 
 void VideoFrameSink::setPeerId(const QString& id) {
-  if (m_peerId == id)
+  if (m_peerId == id) {
     return;
+  }
   m_peerId = id;
   qDebug() << Q_FUNC_INFO << "peerId set to:" << id;
   emit peerIdChanged();
@@ -49,7 +50,7 @@ GstFlowReturn VideoFrameSink::on_new_sample(GstAppSink* sink, gpointer user_data
   auto* self = static_cast<VideoFrameSink*>(user_data);
 
   GstSample* sample = gst_app_sink_pull_sample(sink);
-  if (!sample) {
+  if (sample == nullptr) {
     qWarning() << "[VideoFrameSink] on_new_sample: null sample";
     return GST_FLOW_OK;
   }
@@ -73,19 +74,19 @@ GstFlowReturn VideoFrameSink::on_new_sample(GstAppSink* sink, gpointer user_data
 
 QImage VideoFrameSink::convertSample(GstSample* sample) {
   GstBuffer* buffer = gst_sample_get_buffer(sample);
-  if (!buffer) {
+  if (buffer == nullptr) {
     qWarning() << Q_FUNC_INFO << "No buffer in sample";
     return {};
   }
 
   GstCaps* caps = gst_sample_get_caps(sample);
-  if (!caps) {
+  if (caps == nullptr) {
     qWarning() << Q_FUNC_INFO << "No caps in sample";
     return {};
   }
 
   GstVideoInfo info;
-  if (!gst_video_info_from_caps(&info, caps)) {
+  if (gst_video_info_from_caps(&info, caps) == 0) {
     qWarning() << Q_FUNC_INFO << "Failed to get video info from caps";
     return {};
   }
@@ -95,7 +96,7 @@ QImage VideoFrameSink::convertSample(GstSample* sample) {
   const GstVideoFormat fmt    = GST_VIDEO_INFO_FORMAT(&info);
 
   GstMapInfo map;
-  if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+  if (gst_buffer_map(buffer, &map, GST_MAP_READ) == 0) {
     qWarning() << Q_FUNC_INFO << "Failed to map buffer";
     return {};
   }
@@ -107,10 +108,14 @@ QImage VideoFrameSink::convertSample(GstSample* sample) {
       break;
     case GST_VIDEO_FORMAT_BGR:
       // Qt has no BGR24 — convert via RGBX workaround: copy to RGB and swap
-      img = QImage(map.data, width, height, width * 3, QImage::Format_RGB888).rgbSwapped();
+      img =
+          QImage(map.data, width, height, static_cast<qsizetype>(width * 3), QImage::Format_RGB888)
+              .rgbSwapped();
       break;
     case GST_VIDEO_FORMAT_RGB:
-      img = QImage(map.data, width, height, width * 3, QImage::Format_RGB888).copy();
+      img =
+          QImage(map.data, width, height, static_cast<qsizetype>(width * 3), QImage::Format_RGB888)
+              .copy();
       break;
     case GST_VIDEO_FORMAT_RGBA:
       img = QImage(map.data, width, height, QImage::Format_RGBA8888).copy();

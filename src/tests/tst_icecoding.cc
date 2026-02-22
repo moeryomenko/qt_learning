@@ -44,7 +44,7 @@ class TstIceCoding : public QObject {
   // -----------------------------------------------------------------------
   // Case 1: sdpMid field is present and is a string
   // -----------------------------------------------------------------------
-  void test_sdpMid_isString() {
+  static void test_sdpMid_isString() {
     qDebug() << Q_FUNC_INFO;
     IceCandidate ice;
     ice.candidate     = "candidate:1 1 udp 2 10.0.0.1 9 typ host";
@@ -60,7 +60,7 @@ class TstIceCoding : public QObject {
   // -----------------------------------------------------------------------
   // Case 2: sdpMLineIndex field is present and is an integer
   // -----------------------------------------------------------------------
-  void test_sdpMLineIndex_isInt() {
+  static void test_sdpMLineIndex_isInt() {
     qDebug() << Q_FUNC_INFO;
     IceCandidate ice;
     ice.candidate     = "candidate:1 1 udp 2 10.0.0.1 9 typ host";
@@ -77,7 +77,7 @@ class TstIceCoding : public QObject {
   // -----------------------------------------------------------------------
   // Case 3: Round-trip audio ICE (encode -> decode -> compare)
   // -----------------------------------------------------------------------
-  void test_roundtrip_audio() {
+  static void test_roundtrip_audio() {
     qDebug() << Q_FUNC_INFO;
     IceCandidate orig;
     orig.candidate     = "candidate:1 1 udp 2130706431 192.168.0.10 54321 typ host";
@@ -96,7 +96,7 @@ class TstIceCoding : public QObject {
   // -----------------------------------------------------------------------
   // Case 4: Round-trip video ICE (mlineIndex = 1)
   // -----------------------------------------------------------------------
-  void test_roundtrip_video() {
+  static void test_roundtrip_video() {
     qDebug() << Q_FUNC_INFO;
     IceCandidate orig;
     orig.candidate     = "candidate:3 1 tcp 1518214911 172.17.0.2 9 typ host tcptype active";
@@ -114,7 +114,7 @@ class TstIceCoding : public QObject {
   // -----------------------------------------------------------------------
   // Case 5: JSON wire format round-trip via QJsonDocument
   // -----------------------------------------------------------------------
-  void test_jsonDocument_roundtrip() {
+  static void test_jsonDocument_roundtrip() {
     qDebug() << Q_FUNC_INFO;
     IceCandidate orig;
     orig.candidate     = "candidate:1 1 udp 1 192.168.1.1 40000 typ host";
@@ -135,7 +135,7 @@ class TstIceCoding : public QObject {
   // -----------------------------------------------------------------------
   // Case 6: sdpMLineIndex is NOT a string (guard against wrong encoding)
   // -----------------------------------------------------------------------
-  void test_sdpMLineIndex_notString() {
+  static void test_sdpMLineIndex_notString() {
     qDebug() << Q_FUNC_INFO;
     IceCandidate ice;
     ice.candidate     = "candidate:1 1 udp 2 10.0.0.1 9 typ host";

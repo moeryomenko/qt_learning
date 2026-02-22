@@ -43,8 +43,9 @@ class TstApiClient : public QObject {
     const QJsonDocument doc = QJsonDocument::fromJson(body);
     if (!doc.isNull() && doc.isObject()) {
       const QString msg = doc.object().value("message").toString();
-      if (!msg.isEmpty())
+      if (!msg.isEmpty()) {
         return msg;
+      }
     }
     return QString::fromUtf8(body).trimmed();
   }
@@ -54,7 +55,7 @@ class TstApiClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 1: Parse valid access token
   // -----------------------------------------------------------------------
-  void test_parseTokens_accessToken() {
+  static void test_parseTokens_accessToken() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject obj;
     obj["access_token"]       = "eyJhbGciOiJIUzI1NiJ9.test.sig";
@@ -70,7 +71,7 @@ class TstApiClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 2: Parse refresh token and expiry fields
   // -----------------------------------------------------------------------
-  void test_parseTokens_refreshToken() {
+  static void test_parseTokens_refreshToken() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject obj;
     obj["access_token"]       = "at";
@@ -88,7 +89,7 @@ class TstApiClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 3: Parse empty token object returns empty strings
   // -----------------------------------------------------------------------
-  void test_parseTokens_missingFields() {
+  static void test_parseTokens_missingFields() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject obj;  // empty
     const auto  t = parseTokens(obj);
@@ -101,7 +102,7 @@ class TstApiClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 4: Parse room JSON object
   // -----------------------------------------------------------------------
-  void test_parseRoom_basic() {
+  static void test_parseRoom_basic() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject obj;
     obj["id"]   = "room-uuid-001";
@@ -116,7 +117,7 @@ class TstApiClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 5: Parse JSON array of rooms
   // -----------------------------------------------------------------------
-  void test_parseRoomArray() {
+  static void test_parseRoomArray() {
     qDebug() << Q_FUNC_INFO;
     QJsonArray  arr;
     QJsonObject r1;
@@ -128,8 +129,9 @@ class TstApiClient : public QObject {
     arr << r1 << r2;
 
     QList<RoomInfo> rooms;
-    for (const auto& v : arr)
+    for (const auto& v : arr) {
       rooms.append(parseRoom(v.toObject()));
+    }
 
     QCOMPARE(rooms.size(), 2);
     QCOMPARE(rooms[0].name, QString("Room A"));
@@ -140,7 +142,7 @@ class TstApiClient : public QObject {
   // -----------------------------------------------------------------------
   // Case 6: Parse error response body (JSON with "message" key)
   // -----------------------------------------------------------------------
-  void test_extractError_jsonMessage() {
+  static void test_extractError_jsonMessage() {
     qDebug() << Q_FUNC_INFO;
     QJsonObject obj;
     obj["message"]        = "invalid credentials";

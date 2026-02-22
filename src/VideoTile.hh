@@ -26,27 +26,27 @@ class VideoTile : public QQuickPaintedItem {
  public:
   explicit VideoTile(QQuickItem* parent = nullptr);
 
-  QString peerId() const {
+  [[nodiscard]] QString peerId() const {
     return m_peerId;
   }
   void setPeerId(const QString& id);
 
-  QString displayName() const {
+  [[nodiscard]] QString displayName() const {
     return m_displayName;
   }
   void setDisplayName(const QString& name);
 
-  bool muted() const {
+  [[nodiscard]] bool muted() const {
     return m_muted;
   }
   void setMuted(bool m);
 
-  bool videoEnabled() const {
+  [[nodiscard]] bool videoEnabled() const {
     return m_videoEnabled;
   }
   void setVideoEnabled(bool e);
 
-  bool hasVideo() const {
+  [[nodiscard]] bool hasVideo() const {
     return m_hasVideo;
   }
 
@@ -67,7 +67,6 @@ class VideoTile : public QQuickPaintedItem {
  private:
   void setHasVideo(bool v);
 
- private:
   QString m_peerId;
   QString m_displayName;
   bool    m_muted        = false;

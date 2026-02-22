@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QJsonObject>
 #include <QMap>
 #include <QObject>
@@ -26,27 +27,27 @@ class SignalingClient : public QObject {
  public:
   explicit SignalingClient(QObject* parent = nullptr);
 
-  bool connected() const {
+  [[nodiscard]] bool connected() const {
     return m_connected;
   }
-  QString selfId() const {
+  [[nodiscard]] QString selfId() const {
     return m_selfId;
   }
-  QStringList peers() const {
+  [[nodiscard]] QStringList peers() const {
     return m_peers;
   }
-  QString currentRoom() const {
+  [[nodiscard]] QString currentRoom() const {
     return m_currentRoom;
   }
-  QString lastError() const {
+  [[nodiscard]] QString lastError() const {
     return m_lastError;
   }
 
   // Map of peerId -> username for currently connected peers
-  QMap<QString, QString> peerNames() const {
+  [[nodiscard]] QMap<QString, QString> peerNames() const {
     return m_peerNames;
   }
-  Q_INVOKABLE QString peerName(const QString& peerId) const {
+  Q_INVOKABLE [[nodiscard]] QString peerName(const QString& peerId) const {
     return m_peerNames.value(peerId, peerId);
   }
 
@@ -81,7 +82,6 @@ class SignalingClient : public QObject {
   void onError(QAbstractSocket::SocketError err);
   void onReconnectTimeout();
 
- private:
   void setError(const QString& msg);
   void sendJson(const QJsonObject& obj);
   void handleMessage(const QJsonObject& obj);

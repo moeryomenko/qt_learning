@@ -23,11 +23,11 @@ class VideoFrameSink : public QObject {
 
   // Call this ONCE after construction to get the GstElement* to add to a
   // pipeline. Ownership stays with this object (ref held via gst_object_ref).
-  GstElement* element() const {
+  [[nodiscard]] GstElement* element() const {
     return m_appsink;
   }
 
-  QString peerId() const {
+  [[nodiscard]] QString peerId() const {
     return m_peerId;
   }
   void setPeerId(const QString& id);
@@ -41,7 +41,6 @@ class VideoFrameSink : public QObject {
   static GstFlowReturn on_new_sample(GstAppSink* sink, gpointer user_data);
   QImage               convertSample(GstSample* sample);
 
- private:
   GstElement* m_appsink = nullptr;
   QString     m_peerId;
 };
